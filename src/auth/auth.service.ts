@@ -15,9 +15,6 @@ export class AuthService {
     ) { }
 
     private generateTokens(userId: string, role: string) {
-        if (!process.env.JWT_EXPIRES_IN) {
-            throw new Error('abc')
-        }
         const accessToken = this.jwtService.sign({
             userId, role
         }, {
