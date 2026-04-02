@@ -35,6 +35,6 @@ export class JWTStrategy extends PassportStrategy(Strategy) {
             throw new UnauthorizedException()
         }
 
-        return user
+        return user;
     }
 }

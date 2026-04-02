@@ -1,10 +1,8 @@
-import { Body, Controller, Get, Header, HttpCode, HttpStatus, Post, Res } from '@nestjs/common';
-import { RegisterDTO } from './dto/register.dto';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDTO, LogoutDTO } from './dto/login.dto';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { GetUser, Public } from './decorators/user.decorator';
-import { Roles, RolesGuard } from './guards/roles.guard';
+import { LoginDTO, LogoutDTO } from './dto/login.dto';
+import { RegisterDTO } from './dto/register.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -30,12 +28,12 @@ export class AuthController {
 
     @Post('logout')
     @HttpCode(HttpStatus.OK)
-    async logout(@Body() userId: LogoutDTO, @Res({passthrough: true}) response: Response): Promise<void> {
+    async logout(@Body() userId: LogoutDTO, @Res({ passthrough: true }) response: Response): Promise<void> {
         await this.authService.logout(userId);
     }
 
     @Get('me')
-    getUserMe(@GetUser() user: any) {
+    async getUserMe(@GetUser() user: any) {
         return { user }
     }
 }
