@@ -7,12 +7,16 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import { OrderController } from './orders/order.controller';
+import { OrderService } from './orders/order.service';
+import { OrderModule } from './orders/order.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
-    AuthModule],
+    AuthModule,
+    OrderModule],
   providers: [
     {
       provide: APP_GUARD,
@@ -29,7 +33,7 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
     {
       provide: APP_INTERCEPTOR,
       useClass: ResponseInterceptor
-    }
-  ]
+    },
+  ],
 })
 export class AppModule { }
