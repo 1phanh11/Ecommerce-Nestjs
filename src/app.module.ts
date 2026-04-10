@@ -10,13 +10,16 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
 import { OrderController } from './orders/order.controller';
 import { OrderService } from './orders/order.service';
 import { OrderModule } from './orders/order.module';
+import { ProductsModule } from './products/products.module';
+import { ProductController } from './product/product.controller';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
     AuthModule,
-    OrderModule],
+    OrderModule,
+    ProductsModule],
   providers: [
     {
       provide: APP_GUARD,
@@ -35,5 +38,6 @@ import { OrderModule } from './orders/order.module';
       useClass: ResponseInterceptor
     },
   ],
+  controllers: [ProductController],
 })
 export class AppModule { }

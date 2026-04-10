@@ -20,7 +20,6 @@ export class RolesGuard implements CanActivate {
 
         const { user } = context.switchToHttp().getRequest()
         const condition = roles.some(role => user?.role.toLowerCase() == role.toLowerCase());
-        console.log('Check condition role guard: ', condition);
         
         return condition;
     }

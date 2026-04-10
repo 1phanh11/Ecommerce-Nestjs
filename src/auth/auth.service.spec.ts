@@ -44,6 +44,8 @@ describe('AuthService', () => {
     prismaService = module.get<PrismaService>(PrismaService);
   });
 
+  afterEach(() => {jest.clearAllMocks()})
+
   describe('register', () => {
     it('Should throw ConflictError if user email exist', async () => {
       jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue({

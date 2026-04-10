@@ -11,10 +11,6 @@ class OrderItemDTO{
 }
 
 export class CreateOrderDTO{
-    @IsString({message: 'User id is not valid'})
-    @IsUUID()
-    userId: string
-
     @IsArray()
     @ArrayMinSize(1, {message: 'Order must have 1 product'})
     @ValidateNested({each: true})

@@ -20,6 +20,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
             code = exception.name.replace('Exception', '').toUpperCase();
         }
 
+        
         this.logger.error("\n" + JSON.stringify({
             success: false,
             error: {
