@@ -38,6 +38,5 @@ import { ProductController } from './products/product.controller';
       useClass: ResponseInterceptor
     },
   ],
-  controllers: [ProductController],
 })
 export class AppModule { }
