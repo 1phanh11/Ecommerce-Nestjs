@@ -6,31 +6,34 @@ import { UpdateProductDTO } from './dto/update.dto';
 import { Public } from  "../auth/decorators/user.decorator";
 import { ProductFilterDTO } from './dto/get-all-products.dto';
 
-@Controller('product')
+@Controller('products')
 export class ProductController {
     constructor(
         private productService: ProductsService
     ){}
 
-    @Post('create')
+    @Post()
     @HttpCode(HttpStatus.CREATED)
     @Roles('ADMIN')
     async createProduct(@Body() dto: CreateProductDTO) {
         return await this.productService.create(dto);
     }
 
-    @Put('update/:id')
+    @Put(':id')
     @HttpCode(200)
     @Roles('ADMIN')
     async updateProduct(@Param('id') productId: string, @Body() dto: UpdateProductDTO){
         return await this.productService.update(productId,dto);
     }
 
-    @Delete('delete/:id')
+    @Delete(':id')
     @HttpCode(200)
     @Roles('ADMIN')
     async deleteProduct(@Param('id') productId: string){
         await this.productService.delete(productId) 
+        return {
+            message: "Product deleted successfully"
+        }
     }
 
     @Get(':id')

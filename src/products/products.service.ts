@@ -1,11 +1,9 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateProductDTO } from './dto/create.dto';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import slugify from 'slugify';
-import { UpdateProductDTO } from './dto/update.dto';
-import { NotFoundError } from 'rxjs';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateProductDTO } from './dto/create.dto';
 import { ProductFilterDTO } from './dto/get-all-products.dto';
-import { Product } from 'src/generated';
+import { UpdateProductDTO } from './dto/update.dto';
 
 @Injectable()
 export class ProductsService {
