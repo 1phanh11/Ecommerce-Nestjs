@@ -38,6 +38,7 @@ model User {
   role         Role     @default(USER)
   refreshToken String? // Lưu trữ refresh token cho JWT và Nullable vì không phải lúc nào cũng có do login/logout
   orders       Order[]
+  carts       Cart[]  // Một user có thể có nhiều cart (lịch sử cart), nhưng chỉ có 1 cart đang hoạt động
   isActive    Boolean   @default(true)
   deactivatedAt DateTime?
   createdAt    DateTime @default(now())
@@ -66,6 +67,7 @@ model Product {
   category    Category    @relation(fields: [categoryId], references: [id])
   categoryId  String
   orderItems  OrderItem[]
+  carts       CartItem[]
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
@@ -102,4 +104,29 @@ model OrderItem {
 
   @@index([orderId])
   @@index([productId])
+}
+
+// prisma/schema.prisma — thêm vào
+
+model Cart {
+  id     String     @id @default(cuid())
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String     @unique  // 1 user = 1 cart duy nhất
+  items  CartItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CartItem {
+  id       String @id @default(cuid())
+  cart     Cart   @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  cartId   String
+  product  Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+  quantity Int    @default(1)
+
+  // 1 cart không thể có 2 dòng cùng productId
+  @@unique([cartId, productId])
+  @@index([cartId])
 }
