@@ -32,8 +32,4 @@ export class AuthController {
         await this.authService.logout(userId);
     }
 
-    @Get('me')
-    async getUserMe(@GetUser() user: any) {
-        return { user }
-    }
 }

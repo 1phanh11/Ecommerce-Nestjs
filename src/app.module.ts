@@ -12,6 +12,7 @@ import { OrderService } from './orders/order.service';
 import { OrderModule } from './orders/order.module';
 import { ProductsModule } from './products/products.module';
 import { ProductController } from './products/product.controller';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import { ProductController } from './products/product.controller';
     PrismaModule,
     AuthModule,
     OrderModule,
-    ProductsModule],
+    ProductsModule,
+    UsersModule],
   providers: [
     {
       provide: APP_GUARD,

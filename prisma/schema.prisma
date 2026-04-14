@@ -38,6 +38,8 @@ model User {
   role         Role     @default(USER)
   refreshToken String? // Lưu trữ refresh token cho JWT và Nullable vì không phải lúc nào cũng có do login/logout
   orders       Order[]
+  isActive    Boolean   @default(true)
+  deactivatedAt DateTime?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -77,7 +79,7 @@ model Order {
   status OrderStatus @default(PENDING)
   total  Float //snapshot tổng giá trị đơn hàng tại thời điểm đặt hàng
   user   User        @relation(fields: [userId], references: [id])
-  userId String
+  userId String 
 
   items     OrderItem[]
   createdAt DateTime    @default(now())

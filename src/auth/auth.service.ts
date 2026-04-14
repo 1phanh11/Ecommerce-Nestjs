@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
@@ -86,6 +86,10 @@ export class AuthService {
             throw new BadRequestException(`Authentication Error: Email or Password invalid`)
         }
 
+        if (!existUser.isActive) {
+            throw new UnauthorizedException('Account has been deactivated')
+        }
+
         const hashCompare = bcrypt.compare(loginDto.password, existUser.password)
 
         if (!hashCompare) {
@@ -114,7 +118,7 @@ export class AuthService {
             }
         })
 
-        if(!existUser){
+        if (!existUser) {
             throw new BadRequestException(`User not found`)
         }
 
