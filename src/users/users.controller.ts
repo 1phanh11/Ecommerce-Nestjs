@@ -5,7 +5,7 @@ import {
     Patch
 } from '@nestjs/common'
 import { UsersService } from './users.service'
-import { UpdateProfileDto } from './dto/update-profile.dto'
+import { UpdatePasswordDto, UpdateProfileDto } from './dto/update-profile.dto'
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { RolesGuard, Roles } from '../auth/guards/roles.guard'
@@ -30,7 +30,15 @@ export class UsersController {
         @GetUser('id') userId: string,
         @Body() dto: UpdateProfileDto,
     ) {
-        return await this.usersService.updateProfile(userId, dto)        
+        return await this.usersService.updateProfile(userId, dto)
+    }
+
+    @Patch('me')
+    async updatePassword(
+        @GetUser('id') userId: string,
+        @Body() dto: UpdatePasswordDto,
+    ) {
+        return await this.usersService.updatePassword(userId, dto)
     }
 
     // ─── ADMIN ROUTES ─────────────────────────────────────────
@@ -60,7 +68,7 @@ export class UsersController {
         @Body() dto: AdminUpdateUserDto,
         @GetUser('id') adminId: string
     ) {
-        const result = await this.usersService.adminUpdate(userId, dto,adminId);
+        const result = await this.usersService.adminUpdate(userId, dto, adminId);
         return {
             result
         }

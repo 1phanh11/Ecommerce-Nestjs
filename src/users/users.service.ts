@@ -5,6 +5,10 @@ import { AdminUpdateUserDto } from './dto/admin-update-user.dto'
 import bcrypt from 'bcryptjs'
 import { FilterUserDTO } from './dto/get-all-users.dto'
 
+
+
+
+
 @Injectable()
 export class UsersService {
     constructor(private prismaService: PrismaService) {
@@ -90,8 +94,9 @@ export class UsersService {
         }
 
         const checkPass = await bcrypt.compare(dto.currentPassword, user.password)
+        
         if (!checkPass) {
-            throw new UnauthorizedException('Wrong current password!')
+            throw new UnauthorizedException('Current password not correct')
         }
 
 

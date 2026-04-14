@@ -89,8 +89,9 @@ export class AuthService {
         if (!existUser.isActive) {
             throw new UnauthorizedException('Account has been deactivated')
         }
-
-        const hashCompare = bcrypt.compare(loginDto.password, existUser.password)
+        console.log(loginDto.password , "==============")
+        console.log(existUser.password, "==============")
+        const hashCompare = await bcrypt.compare(loginDto.password, existUser.password)
 
         if (!hashCompare) {
             throw new BadRequestException(`Authentication Error: Email or Password invalid`)
