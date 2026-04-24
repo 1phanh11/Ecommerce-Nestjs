@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import slugify from 'slugify';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductDTO } from './dto/create.dto';
@@ -7,163 +11,160 @@ import { UpdateProductDTO } from './dto/update.dto';
 
 @Injectable()
 export class ProductsService {
-    constructor(
-        private prismaService: PrismaService
-    ) { }
+  constructor(private prismaService: PrismaService) {}
 
-    async create(dto: CreateProductDTO) {
-        const slug = slugify(dto.name, { lower: true, locale: 'vi' })
+  async create(dto: CreateProductDTO) {
+    const slug = slugify(dto.name, { lower: true, locale: 'vi' });
 
-        const existSlug = await this.prismaService.product.findUnique({
-            where: {
-                slug
-            }
-        })
+    const existSlug = await this.prismaService.product.findUnique({
+      where: {
+        slug,
+      },
+    });
 
-        if (existSlug) {
-            throw new ConflictException('This product name is used by other product')
-        }
-
-        const category = await this.prismaService.category.findUnique({
-            where: {
-                id: dto.categoryId
-            }
-        })
-
-        if(!category){
-            throw new NotFoundException('Category not found');
-        }
-
-        return await this.prismaService.product.create({
-            data: {
-                ...dto,
-                slug
-            }
-        })
+    if (existSlug) {
+      throw new ConflictException('This product name is used by other product');
     }
 
-    async update(productId: string, dto: UpdateProductDTO) {
-        const product = await this.prismaService.product.findUnique({
-            where: {
-                id: productId,
-            }
-        })
+    const category = await this.prismaService.category.findUnique({
+      where: {
+        id: dto.categoryId,
+      },
+    });
 
-        if (!product) {
-            throw new NotFoundException('Product not found')
-        }
-
-        let slug: string = product.slug;
-        let categoryId: string = product.categoryId
-
-        if (dto.name) {
-            slug = slugify(dto.name, { lower: true, locale: 'vi' });
-        }
-
-        if(dto.categoryId){
-            const category = await this.prismaService.category.findUnique({
-                where: {id: dto.categoryId}
-            })
-            if(!category){
-                throw new NotFoundException('Category not found')
-            }
-            categoryId = dto.categoryId
-        }
-
-        return await this.prismaService.product.update({
-            where: { id: productId },
-            data: {
-                ...dto,
-                slug,
-                categoryId
-            }
-        })
+    if (!category) {
+      throw new NotFoundException('Category not found');
     }
 
-    async delete(productId: string) {
-        const product = await this.prismaService.product.findUnique({
-            where: { id: productId }
-        })
+    return await this.prismaService.product.create({
+      data: {
+        ...dto,
+        slug,
+      },
+    });
+  }
 
-        if (!product) {
-            throw new NotFoundException("Product not found");
-        }
+  async update(productId: string, dto: UpdateProductDTO) {
+    const product = await this.prismaService.product.findUnique({
+      where: {
+        id: productId,
+      },
+    });
 
-        return await this.prismaService.product.delete({
-            where: { id: product.id }
-        })
+    if (!product) {
+      throw new NotFoundException('Product not found');
     }
 
-    async getSingleProduct(productId: string) {
-        const product = await this.prismaService.product.findUnique({
-            where: {
-                id: productId
-            }
-        })
-        if (!product) {
-            throw new NotFoundException("Product");
-        }
-        return product;
+    let slug: string = product.slug;
+    let categoryId: string = product.categoryId;
+
+    if (dto.name) {
+      slug = slugify(dto.name, { lower: true, locale: 'vi' });
     }
 
-    async getAllProduct(dto: ProductFilterDTO) {
-        const { categoryId, minPrice, maxPrice, search, page, limit } = dto;
+    if (dto.categoryId) {
+      const category = await this.prismaService.category.findUnique({
+        where: { id: dto.categoryId },
+      });
+      if (!category) {
+        throw new NotFoundException('Category not found');
+      }
+      categoryId = dto.categoryId;
+    }
 
-        const skip = (page - 1) * limit;
+    return await this.prismaService.product.update({
+      where: { id: productId },
+      data: {
+        ...dto,
+        slug,
+        categoryId,
+      },
+    });
+  }
 
-        // Build dynamic where clause based on filters
-        const where: any = {};
+  async delete(productId: string) {
+    const product = await this.prismaService.product.findUnique({
+      where: { id: productId },
+    });
 
-        if (categoryId) {
-            where.categoryId = categoryId;
-        }
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
 
-        if (search) {
-            where.name = {
-                contains: search,
-                mode: 'insensitive'
-            }
-        }
+    return await this.prismaService.product.delete({
+      where: { id: product.id },
+    });
+  }
 
-        if (minPrice || maxPrice) {
-            where.price = {}
-            if (minPrice) {
-                where.price.gte = minPrice;
-            }
-            if (maxPrice) {
-                where.price.lte = maxPrice;
-            }
-        }
+  async getSingleProduct(productId: string) {
+    const product = await this.prismaService.product.findUnique({
+      where: {
+        id: productId,
+      },
+    });
+    if (!product) {
+      throw new NotFoundException('Product');
+    }
+    return product;
+  }
 
+  async getAllProduct(dto: ProductFilterDTO) {
+    const { categoryId, minPrice, maxPrice, search, page, limit } = dto;
 
-        const [products, total] = await Promise.all([this.prismaService.product.findMany({
-            where,
-            include: {
-                category: {
-                    select: {
-                        id: true,
-                        name: true
-                    }
-                }
+    const skip = (page - 1) * limit;
+
+    // Build dynamic where clause based on filters
+    const where: any = {};
+
+    if (categoryId) {
+      where.categoryId = categoryId;
+    }
+
+    if (search) {
+      where.name = {
+        contains: search,
+        mode: 'insensitive',
+      };
+    }
+
+    if (minPrice || maxPrice) {
+      where.price = {};
+      if (minPrice) {
+        where.price.gte = minPrice;
+      }
+      if (maxPrice) {
+        where.price.lte = maxPrice;
+      }
+    }
+
+    const [products, total] = await Promise.all([
+      this.prismaService.product.findMany({
+        where,
+        include: {
+          category: {
+            select: {
+              id: true,
+              name: true,
             },
-            skip,
-            take: limit,
-            orderBy: {
-                createdAt: 'desc'
-            }
-        }),
-        this.prismaService.product.count({ where })
-        ])
+          },
+        },
+        skip,
+        take: limit,
+        orderBy: {
+          createdAt: 'desc',
+        },
+      }),
+      this.prismaService.product.count({ where }),
+    ]);
 
-        return {
-            products, pagination: {
-                total,
-                page,
-                limit,
-                totalPages: Math.ceil(total / limit)
-            }
-        };
-    }
-
-
+    return {
+      products,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
 }

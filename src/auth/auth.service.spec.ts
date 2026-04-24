@@ -7,7 +7,6 @@ import { AuthService } from './auth.service';
 import bcrypt from 'bcryptjs';
 
 describe('AuthService', () => {
-
   let prismaService: PrismaService;
   let authService: AuthService;
 
@@ -21,78 +20,84 @@ describe('AuthService', () => {
             user: {
               findUnique: jest.fn(),
               create: jest.fn(),
-              update: jest.fn()
-            }
-          }
-        }, {
+              update: jest.fn(),
+            },
+          },
+        },
+        {
           provide: JwtService,
           useValue: {
-            sign: jest.fn().mockReturnValue('mock-token')
-          }
+            sign: jest.fn().mockReturnValue('mock-token'),
+          },
         },
         {
           provide: ConfigService,
           useValue: {
-            get: jest.fn().mockReturnValue('test-secret')
-          }
-        }
-
-      ]
+            get: jest.fn().mockReturnValue('test-secret'),
+          },
+        },
+      ],
     }).compile();
 
     authService = module.get<AuthService>(AuthService);
     prismaService = module.get<PrismaService>(PrismaService);
   });
 
-  afterEach(() => {jest.clearAllMocks()})
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
   describe('register', () => {
     it('Should throw ConflictError if user email exist', async () => {
       jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue({
         id: '1',
-        email: "anh.nguyen@test.com"
-      } as any)
-
-      await expect(authService.register({
-        name: 'anh nguyen',
         email: 'anh.nguyen@test.com',
-        password: 'temp'
-      })).rejects.toThrow(ConflictException)
-    })
+      } as any);
+
+      await expect(
+        authService.register({
+          name: 'anh nguyen',
+          email: 'anh.nguyen@test.com',
+          password: 'temp',
+        }),
+      ).rejects.toThrow(ConflictException);
+    });
 
     it('Should hash password before saving', async () => {
-      jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(null)
+      jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(null);
       jest.spyOn(prismaService.user, 'create').mockResolvedValue({
         id: '2',
         name: 'caxlord',
         email: 'test2@test.com',
         createdAt: new Date(),
         role: 'USER',
-      } as any)
+      } as any);
 
       await authService.register({
         name: 'caxlord',
         email: 'test2@test.com',
-        password: 'OKconde'
-      })
+        password: 'OKconde',
+      });
 
-      const firstCreateCall = jest.mocked(prismaService.user.create).mock.calls[0][0];
+      const firstCreateCall = jest.mocked(prismaService.user.create).mock
+        .calls[0][0];
       const passwordHash = firstCreateCall.data.password;
 
-      expect(passwordHash).not.toBe('OKconde')
-      expect(await bcrypt.compare('OKconde',passwordHash)).toBe(true)
-    })
-  })
+      expect(passwordHash).not.toBe('OKconde');
+      expect(await bcrypt.compare('OKconde', passwordHash)).toBe(true);
+    });
+  });
 
   describe('login', () => {
-    it('Should throw Unauthorized error when account not found', async() => {
-      jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(null)
+    it('Should throw Unauthorized error when account not found', async () => {
+      jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(null);
 
-
-      await expect(authService.login({
-        email: 'someAccount@test.com',
-        password: 'temp-password'
-      })).rejects.toThrow(BadRequestException)
-    })
-  })
+      await expect(
+        authService.login({
+          email: 'someAccount@test.com',
+          password: 'temp-password',
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+  });
 });
